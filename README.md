@@ -2,12 +2,47 @@
 
 Pi extension that adds `/select-model`: a popup model picker with favourites plus provider-filtered fuzzy search.
 
-## Install / run locally
+## Install
+
+Install globally (writes to `~/.pi/agent/settings.json`):
 
 ```bash
-pi -e /path/to/pi-model-select
-# or, from this repo
-pi -e .
+pi install npm:@0xkahi/pi-model-select
+```
+
+Or install into the current project only (writes to `.pi/settings.json`, shareable with your team):
+
+```bash
+pi install npm:@0xkahi/pi-model-select -l
+```
+
+Pin a specific version:
+
+```bash
+pi install npm:@0xkahi/pi-model-select@1.0.0
+```
+
+Install directly from GitHub instead of npm:
+
+```bash
+pi install git:github.com/0xKahi/pi-model-select
+pi install git:github.com/0xKahi/pi-model-select@v1.0.0   # pinned
+```
+
+### Try without installing
+
+Use `-e` / `--extension` to load for a single run without modifying settings:
+
+```bash
+pi -e .                          # from inside this repo
+```
+
+### Manage
+
+```bash
+pi list                                       # show installed packages
+pi update npm:@0xkahi/pi-model-select         # update this package
+pi remove npm:@0xkahi/pi-model-select         # uninstall
 ```
 
 The package manifest exposes `./src/index.ts` as a Pi extension.

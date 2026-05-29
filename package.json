@@ -1,6 +1,6 @@
 {
-  "name": "@kahi/pi-model-select",
-  "version": "1.0.0",
+  "name": "@0xkahi/pi-model-select",
+  "version": "0.0.0",
   "description": "Pi extension that adds /select-model with favourites and provider-filtered model search",
   "type": "module",
   "keywords": [
@@ -28,7 +28,10 @@
     "lint": "bun biome",
     "lint:fix": "bun biome --write",
     "type-check": "tsc --noEmit",
-    "check": "bun run lint:fix && bun run type-check"
+    "check": "bun run lint:fix && bun run type-check",
+    "release": "changeset publish",
+    "version": "changeset version",
+    "changeset": "changeset"
   },
   "peerDependencies": {
     "@earendil-works/pi-ai": "*",
@@ -37,6 +40,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.15",
+    "@changesets/cli": "^2.31.0",
     "@types/node": "^24.0.0",
     "bun-types": "latest",
     "typescript": "^5"
