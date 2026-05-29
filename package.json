@@ -1,0 +1,44 @@
+{
+  "name": "@kahi/pi-model-select",
+  "version": "1.0.0",
+  "description": "Pi extension that adds /select-model with favourites and provider-filtered model search",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "model-management"
+  ],
+  "author": "0xKahi",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/0xKahi/pi-model-select.git"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "config.schema.json"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/index.ts"
+    ]
+  },
+  "scripts": {
+    "biome": "biome check ./src",
+    "lint": "bun biome",
+    "lint:fix": "bun biome --write",
+    "type-check": "tsc --noEmit",
+    "check": "bun run lint:fix && bun run type-check"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
+    "@types/node": "^24.0.0",
+    "bun-types": "latest",
+    "typescript": "^5"
+  }
+}

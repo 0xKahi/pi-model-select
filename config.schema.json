@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/0xKahi/pi-model-select/main/config.schema.json",
+  "title": "pi-model-select config",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "favourite": {
+      "type": "array",
+      "default": [],
+      "items": {
+        "type": "object",
+        "required": ["provider", "modelId"],
+        "properties": {
+          "provider": {
+            "type": "string",
+            "minLength": 1
+          },
+          "modelId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "provider_filter": {
+      "type": "array",
+      "default": [],
+      "description": "Provider names to show in Search. Empty array means all authorized providers.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    }
+  },
+  "additionalProperties": false
+}
