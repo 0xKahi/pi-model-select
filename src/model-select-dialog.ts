@@ -132,7 +132,7 @@ export class ModelSelectDialog implements Component, Focusable {
     lines.push('');
     lines.push(this.line(this.renderHelp(), inner));
 
-    const borderColor = (str: string) => this.theme.fg('accent', str);
+    const borderColor = (str: string) => this.theme.fg('border', str);
     const horizontal = '─'.repeat(inner);
     const top = borderColor(`╭${horizontal}╮`);
     const bottom = borderColor(`╰${horizontal}╯`);
@@ -208,7 +208,7 @@ export class ModelSelectDialog implements Component, Focusable {
 
   private renderTitle(): string {
     const current = this.options.currentModel ? ModelFormatter.modelLabel(this.options.currentModel) : 'none';
-    return `${this.theme.fg('accent', this.theme.bold('Select Model'))} ${this.theme.fg('muted', `current: ${current}`)}`;
+    return `${this.theme.fg('customMessageLabel', this.theme.bold('Select Model'))} ${this.theme.fg('muted', `current: ${current}`)}`;
   }
 
   private renderTabs(): string {
