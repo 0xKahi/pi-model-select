@@ -1,5 +1,11 @@
 # @0xkahi/pi-model-select
 
+## 1.1.0
+
+### Minor Changes
+
+- 1e30b66: added vim-keys extension event handler
+
 ## 1.0.1
 
 ### Patch Changes
