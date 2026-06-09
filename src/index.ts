@@ -1,12 +1,12 @@
 import type { Api, Model } from '@earendil-works/pi-ai';
-import type { ExtensionAPI, ExtensionCommandContext } from '@earendil-works/pi-coding-agent';
+import type { ExtensionAPI, ExtensionCommandContext, ExtensionContext } from '@earendil-works/pi-coding-agent';
 import { ConfigLoader } from './config-loader.ts';
-import { COMMAND_NAME } from './constants.ts';
+import { COMMAND_NAME, PI_VIM_KEY_EVENT_ID } from './constants.ts';
 import { ModelSelectDialog } from './model-select-dialog.ts';
 import type { DialogResult, LoadedConfig, ModelItem, ModelLists } from './types.ts';
 import { ModelFormatter } from './utils/model-formatter.ts';
 
-async function buildModelLists(ctx: ExtensionCommandContext, config: LoadedConfig): Promise<ModelLists> {
+async function buildModelLists(ctx: ExtensionContext, config: LoadedConfig): Promise<ModelLists> {
   ctx.modelRegistry.refresh();
 
   const availableModels = ctx.modelRegistry.getAvailable();
@@ -43,7 +43,7 @@ async function buildModelLists(ctx: ExtensionCommandContext, config: LoadedConfi
   return { favouriteItems, favouriteWarnings, searchItems: sortedSearchModels };
 }
 
-function findExactModel(ctx: ExtensionCommandContext, args: string): Model<Api> | undefined {
+function findExactModel(ctx: ExtensionContext, args: string): Model<Api> | undefined {
   const trimmed = args.trim();
   if (!trimmed) {
     return undefined;
@@ -64,7 +64,7 @@ function findExactModel(ctx: ExtensionCommandContext, args: string): Model<Api> 
   return undefined;
 }
 
-async function applySelectedModel(pi: ExtensionAPI, ctx: ExtensionCommandContext, model: Model<Api>): Promise<void> {
+async function applySelectedModel(pi: ExtensionAPI, ctx: ExtensionContext, model: Model<Api>): Promise<void> {
   const success = await pi.setModel(model);
   if (success) {
     ctx.ui.notify(`Model set to ${ModelFormatter.modelLabel(model)}`, 'info');
@@ -73,8 +73,12 @@ async function applySelectedModel(pi: ExtensionAPI, ctx: ExtensionCommandContext
   }
 }
 
-async function showModelSelector(pi: ExtensionAPI, args: string, ctx: ExtensionCommandContext): Promise<void> {
-  await ctx.waitForIdle();
+async function showModelSelector(pi: ExtensionAPI, args: string, ctx: ExtensionContext): Promise<void> {
+  // `waitForIdle` only exists on command contexts. When invoked from the event
+  // bus we get a plain ExtensionContext, so fall back to a best-effort guard.
+  if ('waitForIdle' in ctx && typeof ctx.waitForIdle === 'function') {
+    await (ctx as ExtensionCommandContext).waitForIdle();
+  }
   ctx.modelRegistry.refresh();
 
   const exactModel = findExactModel(ctx, args);
@@ -120,10 +124,31 @@ async function showModelSelector(pi: ExtensionAPI, args: string, ctx: ExtensionC
 }
 
 export default function modelSelectExtension(pi: ExtensionAPI): void {
+  // Keep a reference to the latest context so the event-bus handler (which gets
+  // no context of its own) can open the modal too.
+  let latestCtx: ExtensionContext | undefined;
+
+  pi.on('session_start', async (_event, ctx) => {
+    latestCtx = ctx;
+  });
+
   pi.registerCommand(COMMAND_NAME, {
     description: 'Select/search models with favourites and provider filtering',
     handler: async (args, ctx) => {
+      latestCtx = ctx;
       await showModelSelector(pi, args, ctx);
     },
+  });
+
+  // Cross-extension activation: another extension can open the modal via
+  //   pi.events.emit(PI_VIM_KEY_EVENT_ID)
+  pi.events.on(PI_VIM_KEY_EVENT_ID, () => {
+    const ctx = latestCtx;
+    if (!ctx) {
+      return;
+    }
+    void showModelSelector(pi, '', ctx).catch(error => {
+      ctx.ui.notify(`Failed to open model selector: ${error instanceof Error ? error.message : String(error)}`, 'error');
+    });
   });
 }
