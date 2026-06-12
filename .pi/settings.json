@@ -1,0 +1,3 @@
+{
+  "packages": ["../", { "source": "npm:@0xkahi/pi-model-select", "extensions": [], "skills": [] }]
+}
