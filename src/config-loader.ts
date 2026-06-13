@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getAgentDir } from '@earendil-works/pi-coding-agent';
 import { EXTENSION_ID } from './constants.ts';
-import type { ConfigPaths, LoadedConfig, ModelRef } from './types.ts';
+import type { ConfigPaths, Layout, LoadedConfig, ModelRef } from './types.ts';
 import { parseJsonc } from './utils/jsonc.ts';
 
 type ScopeName = 'global' | 'project';
@@ -11,6 +11,8 @@ type ScopeConfig = {
   favourite: ModelRef[];
   providerFilter: string[];
   providerFilterPresent: boolean;
+  layout: Layout;
+  layoutPresent: boolean;
   warnings: string[];
 };
 
@@ -34,11 +36,13 @@ export class ConfigLoader {
     const globalConfig = ConfigLoader.readScopeConfig(paths.global, 'global');
     const projectConfig = ConfigLoader.readScopeConfig(paths.project, 'project');
     const providerFilter = projectConfig.providerFilterPresent ? projectConfig.providerFilter : globalConfig.providerFilter;
+    const layout = projectConfig.layoutPresent ? projectConfig.layout : globalConfig.layout;
     const favourite = ConfigLoader.dedupeModelRefs([...globalConfig.favourite, ...projectConfig.favourite]);
 
     return {
       favourite,
       providerFilter,
+      layout,
       warnings: [...globalConfig.warnings, ...projectConfig.warnings],
       hasFavouriteSection: favourite.length > 0,
     };
@@ -49,8 +53,24 @@ export class ConfigLoader {
       favourite: [],
       providerFilter: [],
       providerFilterPresent: false,
+      layout: 'inline',
+      layoutPresent: false,
       warnings,
     };
+  }
+
+  private static parseLayout(raw: Record<string, unknown>, sourceLabel: string, warnings: string[]): { present: boolean; value: Layout } {
+    if (!('layout' in raw)) {
+      return { present: false, value: 'inline' };
+    }
+
+    const value = raw.layout;
+    if (value !== 'inline' && value !== 'overlay') {
+      warnings.push(`${sourceLabel}: expected "layout" to be "inline" or "overlay"`);
+      return { present: false, value: 'inline' };
+    }
+
+    return { present: true, value };
   }
 
   private static collectFavouriteValues(raw: Record<string, unknown>): unknown[] {
@@ -164,11 +184,14 @@ export class ConfigLoader {
 
       const favourite = ConfigLoader.collectFavouriteValues(raw).flatMap(value => ConfigLoader.parseFavouriteArray(value, sourceLabel, warnings));
       const providerFilter = ConfigLoader.parseProviderFilter(raw, sourceLabel, warnings);
+      const layout = ConfigLoader.parseLayout(raw, sourceLabel, warnings);
 
       return {
         favourite,
         providerFilter: providerFilter.value,
         providerFilterPresent: providerFilter.present,
+        layout: layout.value,
+        layoutPresent: layout.present,
         warnings,
       };
     } catch (error) {

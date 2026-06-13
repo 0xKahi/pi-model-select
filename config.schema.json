@@ -26,6 +26,12 @@
         "additionalProperties": false
       }
     },
+    "layout": {
+      "type": "string",
+      "enum": ["inline", "overlay"],
+      "default": "inline",
+      "description": "Picker placement. \"inline\" replaces the editor at the bottom (default); \"overlay\" shows a centered floating card."
+    },
     "provider_filter": {
       "type": "array",
       "default": [],

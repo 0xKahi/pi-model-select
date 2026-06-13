@@ -106,16 +106,19 @@ async function showModelSelector(pi: ExtensionAPI, args: string, ctx: ExtensionC
         providerFilter: config.providerFilter,
         configWarnings: [...config.warnings, ...(ctx.modelRegistry.getError() ? [`models.json: ${ctx.modelRegistry.getError()}`] : [])],
         initialSearch: args.trim(),
+        layout: config.layout,
         onDone: done,
       }),
-    {
-      overlay: true,
-      overlayOptions: {
-        anchor: 'center',
-        width: '85%',
-        margin: 1,
-      },
-    },
+    config.layout === 'overlay'
+      ? {
+          overlay: true,
+          overlayOptions: {
+            anchor: 'center',
+            width: '85%',
+            margin: 1,
+          },
+        }
+      : undefined,
   );
 
   if (selected) {

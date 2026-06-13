@@ -1,6 +1,6 @@
 # pi-model-select
 
-Pi extension that adds `/select-model`: a popup model picker with favourites plus provider-filtered fuzzy search.
+Pi extension that adds `/select-model`: a model picker with favourites plus provider-filtered fuzzy search. By default it renders inline like Pi's built-in `/model`; it can optionally render as a centered overlay.
 
 ## Install
 
@@ -67,7 +67,7 @@ The package manifest exposes `./src/index.ts` as a Pi extension.
 
 The extension accepts JSON with comments and trailing commas.
 
-Project config overrides global `provider_filter` when the key is present. Favourites are combined from global then project and de-duplicated.
+Project config overrides global `provider_filter` and `layout` when those keys are present. Favourites are combined from global then project and de-duplicated.
 
 ```jsonc
 {
@@ -86,7 +86,18 @@ Project config overrides global `provider_filter` when the key is present. Favou
       "modelId": "kimi-k2.6"
     }
   ],
+  // Optional. Defaults to "inline", which replaces the editor at the bottom like Pi's /model.
+  // Use "overlay" for the previous centered floating card behavior.
+  "layout": "inline",
   // Empty array means no filter: all authorized providers are shown.
   "provider_filter": ["openai-codex", "anthropic", "opencode-go", "openrouter"]
 }
 ```
+
+### Config options
+
+| Key | Type | Default | Description |
+| --- | --- | --- | --- |
+| `favourite` | `{ provider: string, modelId: string }[]` | `[]` | Models shown in the Favourites tab. Alias keys `favourites`, `favorite`, and `favorites` are also accepted. |
+| `provider_filter` | `string[]` | `[]` | Provider names shown in Search. Empty means all authorized providers. Project config overrides global when present. |
+| `layout` | `"inline" \| "overlay"` | `"inline"` | `inline` replaces the editor at the bottom; `overlay` shows the centered floating card. |
