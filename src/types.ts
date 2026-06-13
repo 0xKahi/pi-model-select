@@ -5,9 +5,12 @@ export type ModelRef = {
   modelId: string;
 };
 
+export type Layout = 'inline' | 'overlay';
+
 export type ModelSelectConfig = {
   favourite: ModelRef[];
   providerFilter: string[];
+  layout: Layout;
 };
 
 export type ConfigPaths = {
@@ -45,5 +48,6 @@ export type DialogOptions = {
   providerFilter: string[];
   configWarnings: string[];
   initialSearch: string;
+  layout: Layout;
   onDone: (result: DialogResult) => void;
 };

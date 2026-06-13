@@ -106,7 +106,29 @@ export class ModelSelectDialog implements Component, Focusable {
 
   render(width: number): string[] {
     const safeWidth = Math.max(3, width);
+
+    if (this.options.layout === 'inline') {
+      const inner = safeWidth;
+      const lines = this.buildContentLines(inner);
+      const rule = this.theme.fg('border', '─'.repeat(inner));
+      const body = lines.map(line => this.padLine(line, inner));
+      return [rule, ...body, rule];
+    }
+
     const inner = safeWidth - 2;
+    const lines = this.buildContentLines(inner);
+
+    const borderColor = (str: string) => this.theme.fg('border', str);
+    const horizontal = '─'.repeat(inner);
+    const top = borderColor(`╭${horizontal}╮`);
+    const bottom = borderColor(`╰${horizontal}╯`);
+    const side = borderColor('│');
+
+    const wrapped = lines.map(line => `${side}${this.padLine(line, inner)}${side}`);
+    return [top, ...wrapped, bottom];
+  }
+
+  private buildContentLines(inner: number): string[] {
     const lines: string[] = [];
 
     lines.push(this.line(this.renderTitle(), inner));
@@ -132,14 +154,7 @@ export class ModelSelectDialog implements Component, Focusable {
     lines.push('');
     lines.push(this.line(this.renderHelp(), inner));
 
-    const borderColor = (str: string) => this.theme.fg('border', str);
-    const horizontal = '─'.repeat(inner);
-    const top = borderColor(`╭${horizontal}╮`);
-    const bottom = borderColor(`╰${horizontal}╯`);
-    const side = borderColor('│');
-
-    const wrapped = lines.map(line => `${side}${this.padLine(line, inner)}${side}`);
-    return [top, ...wrapped, bottom];
+    return lines;
   }
 
   private padLine(text: string, innerWidth: number): string {
