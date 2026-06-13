@@ -1,5 +1,11 @@
 # @0xkahi/pi-model-select
 
+## 1.1.1
+
+### Patch Changes
+
+- b24b7bf: added inline and overlay layouts
+
 ## 1.1.0
 
 ### Minor Changes
